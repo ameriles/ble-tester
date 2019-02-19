@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,18 +23,14 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import ar.com.pinard.bletester.CharacteristicListener;
+import ar.com.pinard.bletester.NoticeCharacteristicDialogListener;
 import ar.com.pinard.bletester.R;
 
-public class CharacteristicDialogFragment extends DialogFragment {
-
-    public interface NoticeCharacteristicDialogListener {
-        void onWriteCharacteristic(BluetoothGattCharacteristic characteristic, String value);
-        void onReadCharacteristic(BluetoothGattCharacteristic characteristic);
-        void onEnableNotification(BluetoothGattCharacteristic characteristic);
-        void onDisableNotification(BluetoothGattCharacteristic characteristic);
-    }
+public class CharacteristicDialogFragment extends DialogFragment implements CharacteristicListener {
 
     public static String BLUETOOTH_SERVICE = "BLUETOOH_SERVICE";
     private BluetoothGattService mService;
@@ -123,7 +121,10 @@ public class CharacteristicDialogFragment extends DialogFragment {
             mSelectedCharacteristic = mService.getCharacteristic(UUID.fromString(uuid));
 
             if (mSelectedCharacteristic.getValue() != null) {
-                mTvReadValue.setText(String.valueOf(mSelectedCharacteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, 0).intValue()));
+                Integer intValue = mSelectedCharacteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, 0);
+                if (intValue != null) {
+                    mTvReadValue.setText(String.valueOf(intValue.intValue()));
+                }
             } else {
                 mTvReadValue.setText("null");
             }
@@ -159,4 +160,9 @@ public class CharacteristicDialogFragment extends DialogFragment {
             }
         }
     };
+
+    @Override
+    public void onChanged(String stringValue) {
+        mTvReadValue.setText(stringValue);
+    }
 }

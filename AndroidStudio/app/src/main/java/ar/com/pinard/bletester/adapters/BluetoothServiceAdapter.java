@@ -1,6 +1,5 @@
 package ar.com.pinard.bletester.adapters;
 
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.support.annotation.NonNull;

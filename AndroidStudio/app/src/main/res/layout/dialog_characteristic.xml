@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="4dp">
 
     <TextView
         android:id="@+id/characteristic_tv_service"
@@ -14,40 +15,79 @@
         android:textAlignment="center"
         />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pick characteristic"
+        android:textAlignment="center"
+        />
+
     <Spinner
         android:id="@+id/characteristic_sp_characteristics"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />
 
-    <TextView
-        android:id="@+id/characteristic_tv_read_value"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:text="VALUE"
-        />
+        android:orientation="horizontal">
 
-    <Button android:id="@+id/characteristic_bt_read"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="READ"/>
+        <TextView
+            android:id="@+id/characteristic_tv_read_value"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:text="VALUE"
+            />
 
-    <EditText
-        android:id="@+id/characteristic_et_write_value"
+        <Button android:id="@+id/characteristic_bt_read"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="READ VALUE"/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:orientation="horizontal">
 
-    <Button android:id="@+id/characteristic_bt_write"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="WRITE"/>
+        <EditText
+            android:id="@+id/characteristic_et_write_value"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            />
 
-    <ToggleButton
-        android:id="@+id/characteristic_tb_notification"
-        android:layout_width="wrap_content"
+        <Button android:id="@+id/characteristic_bt_write"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="WRITE VALUE"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:text="NOTIFICATIONS"
+            />
+
+        <ToggleButton
+            android:id="@+id/characteristic_tb_notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+    </LinearLayout>
+
+
+
 </LinearLayout>

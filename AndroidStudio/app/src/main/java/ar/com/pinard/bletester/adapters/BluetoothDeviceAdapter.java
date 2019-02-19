@@ -29,7 +29,8 @@ public class BluetoothDeviceAdapter extends ArrayAdapter<BluetoothDevice> {
         TextView tvName = convertView.findViewById(R.id.device_tv_name);
         TextView tvAddress = convertView.findViewById(R.id.device_tv_address);
         // Populate the data into the template view using the data object
-        tvName.setText(device.getName());
+        String name = device.getName();
+        tvName.setText(name == null ? "<Unknown device>" : name);
         tvAddress.setText(device.getAddress());
         // Return the completed view to render on screen
         return convertView;

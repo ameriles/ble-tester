@@ -8,25 +8,23 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
-import android.os.Parcelable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import ar.com.pinard.bletester.adapters.BluetoothServiceAdapter;
 import ar.com.pinard.bletester.fragments.CharacteristicDialogFragment;
 
-public class ServicesActivity extends AppCompatActivity implements CharacteristicDialogFragment.NoticeCharacteristicDialogListener{
+public class ServicesActivity extends AppCompatActivity implements NoticeCharacteristicDialogListener, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String BLUETOOTH_DEVICE = "BLUETOOTH_DEVICE";
     private static final String TAG = ServicesActivity.class.getSimpleName();
@@ -34,11 +32,16 @@ public class ServicesActivity extends AppCompatActivity implements Characteristi
     private BluetoothGatt mBluetoothGatt;
     private ListView mServicesListView;
     private BluetoothServiceAdapter mServicesAdapter;
+    private SwipeRefreshLayout mSwipeRefresh;
+    private CharacteristicListener mCharacteristicListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_services);
+
+        mSwipeRefresh = findViewById(R.id.services_swipe_refresh);
+        mSwipeRefresh.setOnRefreshListener(this);
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null) {
@@ -60,10 +63,13 @@ public class ServicesActivity extends AppCompatActivity implements Characteristi
     }
 
     private void tryConnect() {
+        mSwipeRefresh.setRefreshing(true);
+
         mServicesAdapter.clear();
         mBluetoothGatt = mDevice.connectGatt(this, true, gattCallback);
     }
 
+    // GATT CALLBACK CLASS
     private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -97,6 +103,8 @@ public class ServicesActivity extends AppCompatActivity implements Characteristi
                 }
 
                 Log.d(TAG, "GATT_SUCCESS");
+                mSwipeRefresh.setRefreshing(false);
+
             } else {
                 Log.w(TAG, "onServicesDiscovered received: " + status);
             }
@@ -115,6 +123,10 @@ public class ServicesActivity extends AppCompatActivity implements Characteristi
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             Log.d(TAG, "CHANGED: " + characteristic.getUuid().toString() + " = " + characteristic.getStringValue(0));
+
+            if (mCharacteristicListener != null) {
+                mCharacteristicListener.onChanged(characteristic.getStringValue(0));
+            }
         }
     };
 
@@ -142,9 +154,11 @@ public class ServicesActivity extends AppCompatActivity implements Characteristi
             Bundle bundle = new Bundle();
             bundle.putParcelable(CharacteristicDialogFragment.BLUETOOTH_SERVICE, service);
 
-            DialogFragment dialog = new CharacteristicDialogFragment();
+            CharacteristicDialogFragment dialog = new CharacteristicDialogFragment();
             dialog.setArguments(bundle);
             dialog.show(getFragmentManager(), "characteristics");
+
+            mCharacteristicListener = dialog;
 
 //            StringBuilder sb = new StringBuilder();
 //            for (BluetoothGattCharacteristic c : service.getCharacteristics()) {
@@ -195,5 +209,10 @@ public class ServicesActivity extends AppCompatActivity implements Characteristi
         BluetoothGattDescriptor descriptor = characteristic.getDescriptor(uuid);
         descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE); // could be DISABLE_INDICATION_VALUE depending on the device
         mBluetoothGatt.writeDescriptor(descriptor);
+    }
+
+    @Override
+    public void onRefresh() {
+        tryConnect();
     }
 }
